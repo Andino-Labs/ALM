@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
 import thirdwebIcon from "@public/thirdweb.svg";
-import { client } from "./client";
+import { client } from "@/lib/client";
+import { ClaimRewards } from "@/components/claim";
 
 export default function Home() {
   return (
@@ -18,7 +19,7 @@ export default function Home() {
             }}
           />
         </div>
-
+        <ClaimRewards></ClaimRewards>
         <ThirdwebResources />
       </div>
     </main>
