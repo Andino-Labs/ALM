@@ -70,7 +70,7 @@ export function useWithdrawStaked(safeAddress: string) {
             tokenId: v.tokenId,
           });
 
-          return [rewards, withdraws];
+          return withdraws;
         }),
       );
 

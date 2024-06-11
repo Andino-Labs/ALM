@@ -8,13 +8,14 @@ import {
   prepareTransaction,
   Hex,
   estimateGas,
+  sendAndConfirmTransaction,
 } from "thirdweb";
 import { useWithdrawStaked } from "@/app/hooks/useWithdrawStaked";
 import Safe from "@safe-global/protocol-kit";
 import { ethers6Adapter } from "thirdweb/adapters/ethers6";
 import { client } from "@/lib/client";
 import { optimism } from "thirdweb/chains";
-import { useActiveAccount } from "thirdweb/react";
+import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 
 export function ClaimRewards() {
   const [safeAddress, setSafeAddress] = useState(
@@ -53,18 +54,20 @@ export function ClaimRewards() {
     const tx = prepareTransaction({
       chain: optimism,
       client,
-      to: k.to,
-      value: "0" as any,
+      to: safeAddress,
+      value: 0n,
       data: k.data as Hex,
     });
 
     console.log(nonce);
-    console.log(tx);
+    console.log(k.data);
+
     try {
-      const txs = await estimateGas({
+      const txs = await sendAndConfirmTransaction({
         account,
         transaction: tx,
       });
+
       console.log(txs);
     } catch (e) {
       console.log(e);
