@@ -9,70 +9,31 @@ import {
   Hex,
   estimateGas,
   sendAndConfirmTransaction,
+  sendBatchTransaction,
 } from "thirdweb";
 import { useWithdrawStaked } from "@/app/hooks/useWithdrawStaked";
 import Safe from "@safe-global/protocol-kit";
 import { ethers6Adapter } from "thirdweb/adapters/ethers6";
 import { client } from "@/lib/client";
 import { optimism } from "thirdweb/chains";
-import { useActiveAccount, useActiveWallet } from "thirdweb/react";
+import {
+  useActiveAccount,
+  useActiveWallet,
+  useSendBatchTransaction,
+  useSendTransaction,
+} from "thirdweb/react";
 
 export function ClaimRewards() {
+  const { mutate: sendTransaction, isPending } = useSendTransaction();
+  const { mutate: sendBatchTransaction, isPending: isBatchPending } =
+    useSendBatchTransaction();
+
   const [safeAddress, setSafeAddress] = useState(
-    "0xB1fa7f7E4d2972a361392FdC4F7559542b4cA04A",
+    "0xb81D12E9D9f9cB044046b6d5830DA536e3205049",
   );
-  const account = useActiveAccount();
 
   const { stakingData, preparedTxs } = useWithdrawStaked(safeAddress);
-  const executeSafeTransactions = useCallback(async () => {
-    if (!account) {
-      console.log("no signer");
-      return;
-    }
-
-    const gnosisTransactions = await Promise.all(
-      preparedTxs.map(async (v) => ({
-        to: v.to as string,
-        value: "0",
-        data: await encode(v),
-        operation: 0,
-      })),
-    );
-    console.log(gnosisTransactions);
-    console.log(
-      `https://10.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}`,
-    );
-
-    const protocolKit = await Safe.init({
-      safeAddress: "0xB1fa7f7E4d2972a361392FdC4F7559542b4cA04A",
-      provider: `https://10.rpc.thirdweb.com/${process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}`,
-    });
-    const nonce = await protocolKit.getThreshold();
-
-    const k = await protocolKit.createTransactionBatch(gnosisTransactions);
-
-    const tx = prepareTransaction({
-      chain: optimism,
-      client,
-      to: safeAddress,
-      value: 0n,
-      data: k.data as Hex,
-    });
-
-    console.log(nonce);
-    console.log(k.data);
-
-    try {
-      const txs = await sendAndConfirmTransaction({
-        account,
-        transaction: tx,
-      });
-
-      console.log(txs);
-    } catch (e) {
-      console.log(e);
-    }
-  }, [preparedTxs, account]);
+  const account = useActiveAccount();
 
   return (
     <div className="flex flex-col w-full">
@@ -93,13 +54,7 @@ export function ClaimRewards() {
           />
         ))}
       </div>
-      <button
-        onClick={() => {
-          executeSafeTransactions();
-        }}
-      >
-        unstake
-      </button>
+      <button onClick={() => {}}>unstake</button>
     </div>
   );
 }
